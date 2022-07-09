@@ -8,6 +8,7 @@ async function httpGetPlanets() {
 
 	// Load planets and return as JSON.
 
+	console.log(response);
 	return await response.json();
 }
 
