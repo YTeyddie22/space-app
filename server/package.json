@@ -12,6 +12,7 @@
 	"author": "Teddy Yongo",
 	"license": "ISC",
 	"dependencies": {
+		"cors": "^2.8.5",
 		"csv-parse": "^5.2.2",
 		"express": "^4.18.1"
 	},
