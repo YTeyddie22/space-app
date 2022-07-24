@@ -1,0 +1,23 @@
+{
+	"name": "space-app",
+	"version": "1.0.0",
+	"description": "This is an app created by react and node used for showing launches, upcoming launches and history of launch missions",
+	"main": "index.js",
+	"scripts": {
+		"client": "npm start --prefix client",
+		"server": "npm run watch --prefix server",
+		"watch": "npm-run-all --parallel server client",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/YTeyddie22/space-app.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/YTeyddie22/space-app/issues"
+	},
+	"homepage": "https://github.com/YTeyddie22/space-app#readme"
+}
