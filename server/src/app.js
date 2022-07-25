@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const morgan = require('morgan');
 
 //!Modules
 const planetRouter = require('./routes/planetRoute');
@@ -13,6 +14,8 @@ app.use(
 		origin: 'http://localhost:3000',
 	})
 );
+//! Introducing logging
+app.use(morgan('combined'));
 app.use(express.json());
 
 //! Get the actual path of the static file
