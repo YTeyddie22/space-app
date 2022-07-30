@@ -22,8 +22,9 @@ app.use(express.json());
 //! Get the actual path of the static file
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-app.use(planetsRouter);
-app.use(launchesRouter);
+//?* Getting the routes directly.
+app.use('/planets', planetsRouter);
+app.use('/launches', launchesRouter);
 
 //! Get the root folder as launch
 //* Check the History API (PushState)
