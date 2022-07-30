@@ -4,7 +4,7 @@ const path = require('path');
 //Third Party LIB
 const {parse} = require('csv-parse');
 
-const habitablePlanet = [];
+const habitablePlanets = [];
 const stream = parse({
 	comment: '#',
 	columns: true,
@@ -27,7 +27,7 @@ function loadPlanetsData() {
 			.pipe(stream)
 			.on('data', (data) => {
 				if (isHabitable(data)) {
-					habitablePlanet.push(data);
+					habitablePlanets.push(data);
 				}
 			})
 			.on('error', (err) => {
@@ -35,13 +35,17 @@ function loadPlanetsData() {
 				reject(err);
 			})
 			.on('end', () => {
-				console.log(`${habitablePlanet.length} habitable planets found!`);
+				console.log(`${habitablePlanets.length} habitable planets found!`);
 				resolve();
 			});
 	});
 }
 
+const getAllPlanets = () => {
+	return habitablePlanets;
+};
+
 module.exports = {
 	loadPlanetsData,
-	planets: habitablePlanet,
+	getAllPlanets,
 };
