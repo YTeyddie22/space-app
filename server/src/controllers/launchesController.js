@@ -1,4 +1,4 @@
-const {getAllLaunches, createNewLaunch} = require('./../models/Launches');
+const { getAllLaunches, createNewLaunch } = require("./../models/Launches");
 
 //* Get all the launches
 function httpGetAllLaunches(req, res) {
@@ -19,13 +19,13 @@ function httpCreateNewLaunch(req, res) {
 		!launch.destination
 	) {
 		return res.status(400).json({
-			error: 'Missing required field',
+			error: "Missing required field",
 		});
 	}
 
 	if (isNaN(launch.launchDate)) {
-		return res.status(404).json({
-			error: 'Invalid date for launching',
+		return res.status(400).json({
+			error: "Invalid date for launching",
 		});
 	}
 
