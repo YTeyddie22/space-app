@@ -1,4 +1,5 @@
 //* Allows us to map any key ot any object
+//const launches = require("./Launches.mongo");
 const launches = new Map();
 
 let latestFlightNumber = 100;
@@ -45,7 +46,6 @@ function abortLaunchId(launchId) {
 }
 
 module.exports = {
-	existsLaunchId,
 	getAllLaunches,
 	createNewLaunch,
 	launchWithIdExists,
