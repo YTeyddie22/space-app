@@ -4,7 +4,8 @@ const path = require("path");
 //Third Party LIB
 const { parse } = require("csv-parse");
 
-const habitablePlanets = [];
+const planets = require("./Planets.mongo");
+
 const stream = parse({
 	comment: "#",
 	columns: true,
@@ -19,33 +20,59 @@ function isHabitable(planet) {
 	);
 }
 
+async function getAllPlanets() {
+	return await planets.find(
+		{},
+		{
+			_id: 0,
+			__v: 0,
+		}
+	);
+}
+
+async function savePlanet(planet) {
+	//habitablePlanets.push(data);
+	//Replace Create with Insert and Update (UpSert);
+
+	try {
+		await planets.updateOne(
+			{
+				keplerName: planet.kepler_name,
+			},
+			{
+				keplerName: planet.kepler_name,
+			},
+			{
+				upsert: true,
+			}
+		);
+	} catch (error) {
+		console.error(`Could not save the planet ${error}`);
+	}
+}
+
 function loadPlanetsData() {
 	return new Promise((resolve, reject) => {
 		fs.createReadStream(
 			path.join(__dirname, "..", "..", "data", "kepler_data.csv")
 		)
 			.pipe(stream)
-			.on("data", (data) => {
+			.on("data", async (data) => {
 				if (isHabitable(data)) {
-					habitablePlanets.push(data);
+					savePlanet(data);
 				}
 			})
 			.on("error", (err) => {
 				console.log(err);
 				reject(err);
 			})
-			.on("end", () => {
-				console.log(
-					`${habitablePlanets.length} habitable planets found!`
-				);
+			.on("end", async () => {
+				const planetsFound = (await getAllPlanets()).length;
+				console.log(`${planetsFound} habitable planets found!`);
 				resolve();
 			});
 	});
 }
-
-const getAllPlanets = () => {
-	return habitablePlanets;
-};
 
 module.exports = {
 	loadPlanetsData,

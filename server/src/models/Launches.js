@@ -1,6 +1,31 @@
 //* Allows us to map any key ot any object
-//const launches = require("./Launches.mongo");
-const launches = new Map();
+const launches = require("./Launches.mongo");
+const planets = require("./Planets.mongo");
+//const launches = new Map();
+//launches.set(launch.flightNumber, launch);
+
+async function getAllLaunches() {
+	return await launches.find({}, { _id: 0, __v: 0 });
+}
+
+async function saveLaunch(launch) {
+	const planet = await planets.findOne({
+		keplerName: launch.target,
+	});
+
+	if (!planet) {
+		throw new Error("No matching planet found");
+	}
+	await launches.updateOne(
+		{
+			flightNumber: launch.flightNumber,
+		},
+		launch,
+		{
+			upsert: true,
+		}
+	);
+}
 
 let latestFlightNumber = 100;
 const launch = {
@@ -9,19 +34,15 @@ const launch = {
 	rocket: "Explorer Is1",
 	launchDate: new Date("March 22, 2030"),
 	target: "Kepler-442 b",
-	customer: ["JNY", "PTY"],
+	customers: ["JNY", "PTY"],
 	upcoming: true,
 	success: true,
 };
 
-launches.set(launch.flightNumber, launch);
+saveLaunch(launch);
 
 function launchWithIdExists(launchId) {
 	return launches.has(launchId);
-}
-
-function getAllLaunches() {
-	return Array.from(launches.values());
 }
 
 function createNewLaunch(launch) {

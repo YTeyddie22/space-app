@@ -1,11 +1,14 @@
 const http = require("http");
 const mongoose = require("mongoose");
 const app = require("./app");
+const dotEnv = require("dotenv");
+
+dotEnv.config();
 
 const PORT = process.env.PORT || 8000;
 const { loadPlanetsData } = require("./models/Planets");
 
-const MONGO_URL = "";
+const MONGO_URL = MONGOURL;
 
 const server = http.createServer(app);
 /*
@@ -21,10 +24,7 @@ mongoose.connection.on("error", (err) => {
 });
 */
 mongoose
-	.connect(MONGO_URL, {
-		useUnifiedTopology: true,
-		useNewUrlParser: true,
-	})
+	.connect(MONGO_URL)
 	.then(() => console.log("Connected to DB"))
 	.catch((err) => console.log(`Error: ${err}`));
 
