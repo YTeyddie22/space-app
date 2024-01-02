@@ -1,3 +1,4 @@
+const { trusted } = require("mongoose");
 const {
 	getAllLaunches,
 	scheduleNewLaunch,
@@ -39,18 +40,27 @@ async function httpCreateNewLaunch(req, res) {
 	return res.status(201).json(launch);
 }
 
-function httpAbortLaunch(req, res) {
+async function httpAbortLaunch(req, res) {
 	const launchId = Number(req.params.id);
+	const existingLaunch = await launchWithIdExists(launchId);
 
 	//If launch doesn't exists
-	if (!launchWithIdExists(launchId)) {
+	if (existingLaunch.length < 1) {
 		return res.status(404).json({
 			error: "Launch not found",
 		});
 	}
 
-	const abortedId = abortLaunchId(launchId);
-	return res.status(200).json(abortedId);
+	const abortedId = await abortLaunchId(launchId);
+
+	if (!abortedId) {
+		return res.status(400).json({
+			error: "Launch not Removed",
+		});
+	}
+	return res.status(204).json({
+		modifiedCount: 1,
+	});
 }
 
 module.exports = {

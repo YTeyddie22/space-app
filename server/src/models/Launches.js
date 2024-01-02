@@ -3,8 +3,6 @@ const launches = require("./Launches.mongo");
 const planets = require("./Planets.mongo");
 
 const DEFAULTFLIGHTNUMBER = 100;
-//const launches = new Map();
-//launches.set(launch.flightNumber, launch);
 
 async function getAllLaunches() {
 	return await launches.find({}, { _id: 0, __v: 0 });
@@ -29,7 +27,7 @@ async function saveLaunch(launch) {
 	);
 }
 
-// Defaults to 0 if no launches are present.
+// Defaults to 100 if no launches are present.
 async function getLatestFlightNumber() {
 	const latestFlight = await launches.findOne().sort("-flightNumber");
 
@@ -53,13 +51,39 @@ async function scheduleNewLaunch(launch) {
 	saveLaunch(newLaunch);
 }
 
-function launchWithIdExists(launchId) {
-	return launches.has(launchId);
+async function launchWithIdExists(launchId) {
+	return await launches.find({
+		flightNumber: launchId,
+	});
+}
+
+async function abortLaunchId(launchId) {
+	/*
+	const abortedId = launches.get(launchId);
+	abortedId.upcoming = false;
+	abortedId.success = false;
+
+	*/
+	const aborted = await launches.updateOne(
+		{
+			flightNumber: launchId,
+		},
+		{
+			success: false,
+			upcoming: false,
+		}
+	);
+	return aborted.modifiedCount === 1;
 }
 
 /*
 
 //Adds Data before initially before using MongoDb
+ 
+const launches = new Map();
+launches.set(launch.flightNumber, launch);
+
+
 const launch = {
 	flightNumber: 100,
 	mission: "Kepler Exploration x",
@@ -91,13 +115,6 @@ function createNewLaunch(launch) {
 }
 
 */
-
-function abortLaunchId(launchId) {
-	const abortedId = launches.get(launchId);
-	abortedId.upcoming = false;
-	abortedId.success = false;
-	return abortedId;
-}
 
 module.exports = {
 	getAllLaunches,
