@@ -1,6 +1,8 @@
 //* Allows us to map any key ot any object
 const launches = require("./Launches.mongo");
 const planets = require("./Planets.mongo");
+
+const DEFAULTFLIGHTNUMBER = 100;
 //const launches = new Map();
 //launches.set(launch.flightNumber, launch);
 
@@ -16,7 +18,7 @@ async function saveLaunch(launch) {
 	if (!planet) {
 		throw new Error("No matching planet found");
 	}
-	await launches.updateOne(
+	await launches.findOneAndUpdate(
 		{
 			flightNumber: launch.flightNumber,
 		},
@@ -27,7 +29,37 @@ async function saveLaunch(launch) {
 	);
 }
 
-let latestFlightNumber = 100;
+// Defaults to 0 if no launches are present.
+async function getLatestFlightNumber() {
+	const latestFlight = await launches.findOne().sort("-flightNumber");
+
+	if (!latestFlight) {
+		return DEFAULTFLIGHTNUMBER;
+	}
+
+	return latestFlight.flightNumber;
+}
+
+async function scheduleNewLaunch(launch) {
+	const newFlightNumber = (await getLatestFlightNumber()) + 1;
+
+	const newLaunch = Object.assign(launch, {
+		success: true,
+		upcoming: true,
+		customers: ["PTY", "JNY", "LB", "VA"],
+		flightNumber: newFlightNumber,
+	});
+
+	saveLaunch(newLaunch);
+}
+
+function launchWithIdExists(launchId) {
+	return launches.has(launchId);
+}
+
+/*
+
+//Adds Data before initially before using MongoDb
 const launch = {
 	flightNumber: 100,
 	mission: "Kepler Exploration x",
@@ -41,9 +73,8 @@ const launch = {
 
 saveLaunch(launch);
 
-function launchWithIdExists(launchId) {
-	return launches.has(launchId);
-}
+
+* Pre use before adding MongoDB
 
 function createNewLaunch(launch) {
 	latestFlightNumber++;
@@ -59,6 +90,8 @@ function createNewLaunch(launch) {
 	);
 }
 
+*/
+
 function abortLaunchId(launchId) {
 	const abortedId = launches.get(launchId);
 	abortedId.upcoming = false;
@@ -68,7 +101,7 @@ function abortLaunchId(launchId) {
 
 module.exports = {
 	getAllLaunches,
-	createNewLaunch,
+	scheduleNewLaunch,
 	launchWithIdExists,
 	abortLaunchId,
 };
