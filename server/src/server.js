@@ -1,14 +1,15 @@
-const http = require("http");
-const mongoose = require("mongoose");
-const app = require("./app");
 const dotEnv = require("dotenv");
 
-dotEnv.config();
+dotEnv.config().parsed;
+const http = require("http");
+const path = require("path");
+const mongoose = require("mongoose");
+const app = require("./app");
 
 const PORT = process.env.PORT || 8000;
 const { loadPlanetsData } = require("./models/Planets");
 
-const MONGO_URL = MONGOURL;
+const MONGO_URL = process.env.MONGOURL;
 
 const server = http.createServer(app);
 /*
@@ -23,6 +24,7 @@ mongoose.connection.on("error", (err) => {
 	console.error(err);
 });
 */
+
 mongoose
 	.connect(MONGO_URL)
 	.then(() => console.log("Connected to DB"))
