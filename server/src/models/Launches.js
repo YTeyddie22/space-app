@@ -1,8 +1,35 @@
+//Dependecies
+const axios = require("axios");
+
 //* Allows us to map any key ot any object
 const launches = require("./Launches.mongo");
 const planets = require("./Planets.mongo");
 
 const DEFAULTFLIGHTNUMBER = 100;
+const SPACEX_API_URL = "https://api.spacexdata.com/v4/launches/query";
+
+async function loadLaunchesData() {
+	console.log("Downloading launch data...");
+	const response = await axios.post(SPACEX_API_URL, {
+		query: {},
+		options: {
+			populate: [
+				{
+					path: "rocket",
+					select: {
+						name: 1,
+					},
+				},
+				{
+					path: "payloads",
+					select: {
+						customers: 1,
+					},
+				},
+			],
+		},
+	});
+}
 
 async function getAllLaunches() {
 	return await launches.find({}, { _id: 0, __v: 0 });
@@ -117,6 +144,7 @@ function createNewLaunch(launch) {
 */
 
 module.exports = {
+	loadLaunchesData,
 	getAllLaunches,
 	scheduleNewLaunch,
 	launchWithIdExists,

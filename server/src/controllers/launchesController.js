@@ -1,4 +1,3 @@
-const { trusted } = require("mongoose");
 const {
 	getAllLaunches,
 	scheduleNewLaunch,
