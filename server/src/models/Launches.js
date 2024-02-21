@@ -30,6 +30,11 @@ async function populateLaunches() {
 			],
 		},
 	});
+
+	if (response.status !== 200) {
+		console.log("The Launching of data Failed");
+		throw new Error("Launching data failed");
+	}
 	const launchDocs = response.data.docs;
 
 	for (const launchDoc of launchDocs) {
@@ -49,9 +54,11 @@ async function populateLaunches() {
 		};
 
 		console.log(`${launch.flightNumber} ${launch.mission}`);
-	}
 
-	//Populate the collection in Database
+		//Populate the collection in Database
+
+		await saveLaunch(launch);
+	}
 }
 
 async function loadLaunchesData() {
@@ -72,25 +79,6 @@ async function getAllLaunches() {
 	return await launches.find({}, { _id: 0, __v: 0 });
 }
 
-async function saveLaunch(launch) {
-	const planet = await planets.findOne({
-		keplerName: launch.target,
-	});
-
-	if (!planet) {
-		throw new Error("No matching planet found");
-	}
-	await launches.findOneAndUpdate(
-		{
-			flightNumber: launch.flightNumber,
-		},
-		launch,
-		{
-			upsert: true,
-		}
-	);
-}
-
 // Defaults to 100 if no launches are present.
 async function getLatestFlightNumber() {
 	const latestFlight = await launches.findOne().sort("-flightNumber");
@@ -103,6 +91,13 @@ async function getLatestFlightNumber() {
 }
 
 async function scheduleNewLaunch(launch) {
+	const planet = await planets.findOne({
+		keplerName: launch.target,
+	});
+
+	if (!planet) {
+		throw new Error("No matching planet found");
+	}
 	const newFlightNumber = (await getLatestFlightNumber()) + 1;
 
 	const newLaunch = Object.assign(launch, {
@@ -123,11 +118,6 @@ async function launchWithIdExists(launchId) {
 	});
 }
 
-//Find launch that exists (Generic)
-async function findLaunch(filter) {
-	return await launches.findOne(filter);
-}
-
 async function abortLaunchId(launchId) {
 	/*
 	const abortedId = launches.get(launchId);
@@ -146,6 +136,34 @@ async function abortLaunchId(launchId) {
 	);
 	return aborted.modifiedCount === 1;
 }
+
+//Save launch to the database
+
+async function saveLaunch(launch) {
+	await launches.findOneAndUpdate(
+		{
+			flightNumber: launch.flightNumber,
+		},
+		launch,
+		{
+			upsert: true,
+		}
+	);
+}
+
+//Find launch that exists (Generic)
+
+async function findLaunch(filter) {
+	return await launches.findOne(filter);
+}
+
+module.exports = {
+	loadLaunchesData,
+	getAllLaunches,
+	scheduleNewLaunch,
+	launchWithIdExists,
+	abortLaunchId,
+};
 
 /*
 
@@ -186,11 +204,3 @@ function createNewLaunch(launch) {
 }
 
 */
-
-module.exports = {
-	loadLaunchesData,
-	getAllLaunches,
-	scheduleNewLaunch,
-	launchWithIdExists,
-	abortLaunchId,
-};
