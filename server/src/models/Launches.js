@@ -8,11 +8,12 @@ const planets = require("./Planets.mongo");
 const DEFAULTFLIGHTNUMBER = 100;
 const SPACEX_API_URL = "https://api.spacexdata.com/v4/launches/query";
 
-async function loadLaunchesData() {
+async function populateLaunches() {
 	console.log("Downloading launch data...");
 	const response = await axios.post(SPACEX_API_URL, {
 		query: {},
 		options: {
+			pagination: false,
 			populate: [
 				{
 					path: "rocket",
@@ -48,6 +49,22 @@ async function loadLaunchesData() {
 		};
 
 		console.log(`${launch.flightNumber} ${launch.mission}`);
+	}
+
+	//Populate the collection in Database
+}
+
+async function loadLaunchesData() {
+	const firstLaunch = await findLaunch({
+		flightNumber: 1,
+		rocket: "Falcon 1",
+		mission: "FalconSat",
+	});
+
+	if (firstLaunch) {
+		console.log("Launch Data already loaded");
+	} else {
+		await populateLaunches();
 	}
 }
 
@@ -98,10 +115,17 @@ async function scheduleNewLaunch(launch) {
 	saveLaunch(newLaunch);
 }
 
+//Check a launch if it exists.
+
 async function launchWithIdExists(launchId) {
-	return await launches.find({
+	return await findLaunch({
 		flightNumber: launchId,
 	});
+}
+
+//Find launch that exists (Generic)
+async function findLaunch(filter) {
+	return await launches.findOne(filter);
 }
 
 async function abortLaunchId(launchId) {
