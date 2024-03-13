@@ -76,7 +76,11 @@ async function loadLaunchesData() {
 }
 
 async function getAllLaunches(skip, limit) {
-	return await launches.find({}, { _id: 0, __v: 0 }).skip(skip).limit(limit);
+	return await launches
+		.find({}, { _id: 0, __v: 0 })
+		.sort({ flightNumber: 1 })
+		.skip(skip)
+		.limit(limit);
 }
 
 // Defaults to 100 if no launches are present.
