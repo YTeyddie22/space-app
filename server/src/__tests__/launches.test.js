@@ -67,7 +67,7 @@ describe("Launches API", () => {
 				.expect(400);
 
 			expect(response.body).toStrictEqual({
-				error: "Missing required field",
+				error: "Missing required launch property",
 			});
 		});
 		test("It should catch invalid dates", async () => {
