@@ -25,7 +25,8 @@ async function httpCreateNewLaunch(req, res) {
 		!launch.mission ||
 		!launch.rocket ||
 		!launch.launchDate ||
-		!launch.target
+		!launch.target ||
+		!launch.destination
 	) {
 		return res.status(400).json({
 			error: "Missing required launch property",
