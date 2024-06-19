@@ -1,8 +1,7 @@
-const mongoose = require("mongoose");
 const dotEnv = require("dotenv");
 
-dotEnv.config().parsed;
-
+dotEnv.config({ path: ".env" });
+const mongoose = require("mongoose");
 const MONGO_URL = process.env.MONGOURL;
 
 async function mongoConnect() {

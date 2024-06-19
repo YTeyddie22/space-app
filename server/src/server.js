@@ -4,7 +4,7 @@ const { mongoConnect } = require("./utils/mongo");
 const { loadPlanetsData } = require("./models/Planets");
 const { loadLaunchesData } = require("./models/Launches");
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 const server = http.createServer(app);
 
 async function startServer() {
